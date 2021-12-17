@@ -1,20 +1,28 @@
 const { readFile } = require('fs/promises');
 
-if (process.argv.length < 4) {
-  console.error('You must specify exactly two last names to compare.');
-  process.exit(1);
-}
-
 (async () => {
-  // All names in the data file are uppercase, so ensure our inputs are, too.
-  const name1 = process.argv[2].toUpperCase();
-  const name2 = process.argv[3].toUpperCase();
+  let compareNames = [];
+  let strict = false;
 
-  // Determine if we have a strict flag.
-  const strict = process.argv[4] === '--strict';
+  // Process arguments.
+  process.argv.slice(2).forEach((argument) => {
+    if (argument.substring(0, 2) === '--') {
+      if (argument === '--strict') {
+        strict = true;
+      }
+    } else {
+      compareNames.push(argument.toUpperCase());
+    }
+  });
+
+  // Ensure we have at least two names.
+  if (compareNames.length < 2) {
+    console.error('You must provide at least two names to compare.');
+    process.exit(1);
+  }
 
   // Get a full list of letters from the inputs.
-  const allLetters = [...name1.split(''), ...name2.split('')];
+  const allLetters = compareNames.reduce((acc, item) => [...acc, ...item.split('')], []);
 
   // Get a unique list of letters from the inputs.
   const letters = allLetters.reduce((acc, item) => {
