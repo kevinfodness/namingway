@@ -1,6 +1,6 @@
 const { readFile } = require('fs/promises');
 
-if (process.argv.length !== 4) {
+if (process.argv.length < 4) {
   console.error('You must specify exactly two last names to compare.');
   process.exit(1);
 }
@@ -10,8 +10,14 @@ if (process.argv.length !== 4) {
   const name1 = process.argv[2].toUpperCase();
   const name2 = process.argv[3].toUpperCase();
 
+  // Determine if we have a strict flag.
+  const strict = process.argv[4] === '--strict';
+
+  // Get a full list of letters from the inputs.
+  const allLetters = [...name1.split(''), ...name2.split('')];
+
   // Get a unique list of letters from the inputs.
-  const letters = [...name1.split(''), ...name2.split('')].reduce((acc, item) => {
+  const letters = allLetters.reduce((acc, item) => {
     if (!acc.includes(item)) {
       acc.push(item);
     }
@@ -26,9 +32,20 @@ if (process.argv.length !== 4) {
   // Loop the names and find ones that can be made from just the unique letters.
   const found = [];
   names.forEach((name) => {
+    const remainingLetters = strict ? [...allLetters] : [];
     for (let i = 0; i < name.length; i ++) {
+      // Determine if the unique letters contains this letter at all.
       if (!letters.includes(name.charAt(i))) {
         return;
+      }
+
+      // If we're in strict mode, ensure the letter exists in the remaining letters, then remove it.
+      if (strict) {
+        const pos = remainingLetters.findIndex((letter) => letter === name.charAt(i));
+        if (pos === -1) {
+          return;
+        }
+        remainingLetters.splice(pos, 1);
       }
     }
 
