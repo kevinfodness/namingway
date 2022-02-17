@@ -1,4 +1,4 @@
-# namingway
+# Namingway
 Generates a list of last names that can be made with the letters of two or more
 given last names. `namingway` is an homage to the character from Final Fantasy IV
 that would let you change your name.
